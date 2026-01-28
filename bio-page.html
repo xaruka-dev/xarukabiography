@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Моё био</title>
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      overflow: hidden;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes glitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+      100% { transform: translate(0); }
+    }
+    
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    #background-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      filter: brightness(0.4) contrast(1.1);
+      display: none;
+    }
+    
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(-45deg, #1a1a1a, #0f3460, #16213e, #000);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      z-index: 0;
+    }
+    
+    #overlay {
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.95);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      cursor: pointer;
+      z-index: 1000;
+      text-align: center;
+      padding: 20px;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    #overlay .click-hint {
+      font-size: 16px;
+      margin-top: 20px;
+      color: #aaa;
+      max-width: 80%;
+      animation: pulse 2s infinite;
+    }
+    
+    #overlay .pulse-circle {
+      width: 60px;
+      height: 60px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      margin-bottom: 20px;
+      animation: pulse 1.5s infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #overlay .pulse-circle::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      animation: fadeIn 1s ease;
+    }
+
+    .card {
+      background: rgba(20,20,20,0.75);
+      border-radius: 24px;
+      padding: 40px;
+      width: 340px;
+      text-align: center;
+      box-shadow: 
+        0 0 40px rgba(0,255,255,0.1),
+        0 0 80px rgba(255,0,255,0.05),
+        inset 0 0 20px rgba(255,255,255,0.05);
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.1);
+      transform: translateY(0);
+      transition: all 0.3s ease;
+      animation: slideUp 0.8s ease-out 0.2s both;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 
+        0 15px 50px rgba(0,255,255,0.2),
+        0 0 100px rgba(255,0,255,0.1),
+        inset 0 0 20px rgba(255,255,255,0.1);
+    }
+
+    .avatar-container {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 20px;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid transparent;
+      background: linear-gradient(45deg, #00ffff, #ff00ff) border-box;
+      padding: 4px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .avatar:hover {
+      animation: glitch 0.3s;
+      filter: saturate(1.5);
+    }
+    
+    .avatar-ring {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      border: 2px solid transparent;
+      border-radius: 50%;
+      border-top-color: #00ffff;
+      border-right-color: #ff00ff;
+      animation: spin 8s linear infinite;
+    }
+    
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    h1 {
+      margin: 15px 0 10px;
+      font-size: 32px;
+      background: linear-gradient(45deg, #00ffff, #ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px rgba(0,255,255,0.3);
+      letter-spacing: 1px;
+    }
+
+    .desc {
+      font-size: 15px;
+      color: #ccc;
+      margin-bottom: 25px;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin: 20px 0;
+      padding: 15px 5px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.05);
+      gap: 5px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      flex: 1;
+      min-width: 0;
+      padding: 0 2px;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: bold;
+      background: linear-gradient(45deg, #00ffff, #ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+    
+    .stat-item:nth-child(3) .stat-value {
+      font-size: 22px;
+      letter-spacing: -1px;
+    }
+    
+    .stat-label {
+      font-size: 10px;
+      color: #aaa;
+      margin-top: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+    
+    @media (max-width: 380px) {
+      .stats {
+        padding: 12px 3px;
+        gap: 3px;
+      }
+      
+      .stat-value {
+        font-size: 18px;
+      }
+      
+      .stat-item:nth-child(3) .stat-value {
+        font-size: 20px;
+      }
+      
+      .stat-label {
+        font-size: 9px;
+        letter-spacing: 0.3px;
+      }
+    }
+
+    .volume {
+      margin-top: 25px;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .volume-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    input[type=range] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #00ffff, #ff00ff);
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0,255,255,0.5);
+    }
+
+    .socials {
+      margin-top: 25px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      color: #888;
+      text-decoration: none;
+      font-size: 18px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .social-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.5s;
+    }
+    
+    .social-link:hover {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,255,255,0.3);
+    }
+    
+    .social-link:hover::before {
+      left: 100%;
+    }
+    
+    .social-link:nth-child(1):hover { color: #7289da; }
+    .social-link:nth-child(2):hover { color: #0088cc; }
+    .social-link:nth-child(3):hover { color: #f5f5f5; }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    
+    .particle {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.3;
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="animated-bg"></div>
+
+<video id="background-video" preload="auto" muted loop playsinline>
+  <source src="video.mp4" type="video/mp4">
+  Ваш браузер не поддерживает видео.
+</video>
+
+<div class="particles" id="particles"></div>
+
+<div id="overlay">
+  <div class="pulse-circle"></div>
+  ВЗЛЁТНАЯ ПОЛОСА
+  <div class="click-hint">Нажмите для запуска иммерсивного опыта</div>
+</div>
+
+<div class="card">
+  <div class="avatar-container">
+    <div class="avatar-ring"></div>
+    <img src="avatar.jpg" class="avatar" />
+  </div>
+  
+  <h1>xaruka</h1>
+  <div class="desc">Разработчик | Дизайнер | Мечтатель<br>Создаю цифровые миры</div>
+  
+  <div class="stats">
+    <div class="stat-item">
+      <div class="stat-value">0</div>
+      <div class="stat-label">Проекты</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">99%</div>
+      <div class="stat-label">Успех</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">∞</div>
+      <div class="stat-label">Креатив</div>
+    </div>
+  </div>
+
+  <audio id="music" src="sound.mp3" loop></audio>
+
+  <div class="volume">
+    <div class="volume-label">
+      <span>🔊</span>
+      <span>ГРОМКОСТЬ (10%)</span>
+    </div>
+    <input type="range" min="0" max="1" step="0.01" value="0.1" id="volumeSlider">
+  </div>
+
+  <div class="socials">
+    <a href="#" class="social-link">💬</a>
+    <a href="#" class="social-link">📱</a>
+    <a href="#" class="social-link">⚡</a>
+  </div>
+</div>
+
+<script>
+  const overlay = document.getElementById('overlay');
+  const music = document.getElementById('music');
+  const video = document.getElementById('background-video');
+  const slider = document.getElementById('volumeSlider');
+  const particlesContainer = document.getElementById('particles');
+  const volumeLabel = document.querySelector('.volume-label span:nth-child(2)');
+
+  function createParticles() {
+    for (let i = 0; i < 50; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      particle.style.animation = `float ${3 + Math.random() * 7}s ease-in-out infinite ${Math.random() * 5}s`;
+      particle.style.opacity = Math.random() * 0.5;
+      particle.style.width = particle.style.height = `${1 + Math.random() * 3}px`;
+      particlesContainer.appendChild(particle);
+    }
+  }
+
+  function updateVolumeText(value) {
+    const percent = Math.round(value * 100);
+    volumeLabel.textContent = `ГРОМКОСТЬ (${percent}%)`;
+    
+    const icon = document.querySelector('.volume-label span:nth-child(1)');
+    if (percent === 0) {
+      icon.textContent = '🔇';
+    } else if (percent < 30) {
+      icon.textContent = '🔈';
+    } else if (percent < 70) {
+      icon.textContent = '🔉';
+    } else {
+      icon.textContent = '🔊';
+    }
+  }
+
+  music.volume = 0.1;
+  video.load();
+
+  updateVolumeText(0.1);
+  
+  createParticles();
+
+  slider.addEventListener('input', () => {
+    const value = parseFloat(slider.value);
+    music.volume = value;
+    
+    updateVolumeText(value);
+    
+    const normalizedValue = (value - slider.min) / (slider.max - slider.min);
+    slider.style.background = `linear-gradient(to right, #00ffff 0%, #ff00ff ${normalizedValue * 100}%, rgba(255,255,255,0.1) ${normalizedValue * 100}%, rgba(255,255,255,0.1) 100%)`;
+  });
+
+  slider.dispatchEvent(new Event('input'));
+
+  overlay.addEventListener('click', () => {
+
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.5s ease';
+    
+    setTimeout(() => {
+      overlay.style.display = 'none';
+      
+      video.style.display = 'block';
+      video.style.opacity = '0';
+      
+      const videoPromise = video.play();
+      
+  
+      music.volume = 0.1;
+      const musicPromise = music.play();
+      
+      setTimeout(() => {
+        video.style.transition = 'opacity 1s ease';
+        video.style.opacity = '1';
+      }, 100);
+      
+      if (videoPromise !== undefined) {
+        videoPromise.then(() => {
+          video.muted = false;
+        }).catch(err => {
+          console.log('Видео без звука:', err);
+        });
+      }
+      
+      if (musicPromise !== undefined) {
+        musicPromise.catch(err => {
+          console.log('Музыка не запустилась автоматически');
+          document.addEventListener('click', () => {
+            if (music.paused) {
+              music.play();
+            }
+          }, { once: true });
+        });
+      }
+    }, 500);
+  });
+
+  const card = document.querySelector('.card');
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    card.style.setProperty('--mouse-x', `${x}px`);
+    card.style.setProperty('--mouse-y', `${y}px`);
+  });
+
+  setTimeout(() => {
+    const statValue = document.querySelector('.stat-value');
+    if (statValue) {
+    }
+  }, 2000);
+</script>
+
+</body>
+</html>
